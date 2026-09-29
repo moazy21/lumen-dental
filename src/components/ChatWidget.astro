@@ -9,12 +9,12 @@ const suggestions = [
   'Do you take insurance?',
 ];
 ---
-<div class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end gap-3">
+<div class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end gap-3 pointer-events-none">
   <div
     id="chat-panel"
     role="dialog"
     aria-label="Chat with the LUMEN assistant"
-    class="chat-hidden w-[calc(100vw-2rem)] sm:w-[380px] bg-white border border-line rounded-[20px] flex flex-col overflow-hidden"
+    class="chat-hidden pointer-events-auto w-[calc(100vw-2rem)] sm:w-[380px] bg-white border border-line rounded-[20px] flex flex-col overflow-hidden"
     style="box-shadow: 0 24px 70px -24px rgba(12,59,60,.4); max-height: min(560px, 78dvh);"
   >
     <div class="bg-pine text-porcelain px-5 py-4">
@@ -50,7 +50,7 @@ const suggestions = [
     aria-expanded="false"
     aria-controls="chat-panel"
     aria-label="Open chat with LUMEN assistant"
-    class="w-14 h-14 grid place-items-center rounded-full bg-pine text-porcelain hover:bg-pincedeep transition"
+    class="pointer-events-auto w-14 h-14 grid place-items-center rounded-full bg-pine text-porcelain hover:bg-pincedeep transition"
     style="box-shadow: 0 14px 34px -12px rgba(12,59,60,.55)"
   >
     <span id="chat-icon-open"><Icon name="chat" size={22} /></span>

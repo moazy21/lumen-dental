@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 
 export default defineConfig({
-  site: 'https://lumen-dental.example.com',
+  site: 'https://lumen-dental-olive.vercel.app',
   adapter: vercel(),
   integrations: [tailwind(), sitemap()]
 });

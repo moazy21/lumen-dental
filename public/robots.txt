@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lumen-dental.example.com/sitemap-index.xml
+Sitemap: https://lumen-dental-olive.vercel.app/sitemap-index.xml

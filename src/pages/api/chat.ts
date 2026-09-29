@@ -64,10 +64,11 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
+  const model = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
   if (!apiKey) {
     return Response.json(
-      { error: 'Chat is not configured yet (missing OPENAI_API_KEY).' },
+      { error: 'Chat is not configured yet (missing GROQ_API_KEY).' },
       { status: 503 }
     );
   }
@@ -90,11 +91,11 @@ export const POST: APIRoute = async ({ request }) => {
     .join('\n\n');
 
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model,
         temperature: 0.3,
         max_tokens: 350,
         messages: [

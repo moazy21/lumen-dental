@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+<BaseLayout title="About" description="Meet the LUMEN team. Lead dentists, hygienist, sterilization standards and nervous-patient care.">
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 md:pt-16 grid gap-8 lg:grid-cols-2 items-center">
+    <div>
+      <h1 class="text-4xl sm:text-5xl lg:text-[58px] lg:leading-[1.05] font-extrabold tracking-tight">Small practice, long relationships.</h1>
+      <p class="mt-4 text-ink/70 max-w-[50ch]">LUMEN has served Berkeley for 15 years with the same philosophy: explain everything, charge fairly, remember your name and your molars.</p>
+      <ul class="mt-6 space-y-3 text-[15px] font-bold">
+        <li class="flex items-center gap-2.5"><span class="w-6 h-6 grid place-items-center rounded-full bg-mint text-aquadeep"><Icon name="check" size={13} /></span>Digital X-rays, 90% less radiation</li>
+        <li class="flex items-center gap-2.5"><span class="w-6 h-6 grid place-items-center rounded-full bg-mint text-aquadeep"><Icon name="check" size={13} /></span>Hospital-grade sterilization, logged daily</li>
+        <li class="flex items-center gap-2.5"><span class="w-6 h-6 grid place-items-center rounded-full bg-mint text-aquadeep"><Icon name="check" size={13} /></span>60-minute first visits, never rushed</li>
+      </ul>
+    </div>
+    <div class="rounded-[22px] overflow-hidden aspect-[4/3] bg-mist">
+      <img src="https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1000&q=80&auto=format&fit=crop" alt="Bright LUMEN treatment room" width="1000" height="750" decoding="async" class="w-full h-full object-cover" />
+    </div>
+  </section>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">The people behind the masks</h2>
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-5">
+      {[
+        ['Dr. Amara Osei','Lead dentist · 14 years','Gentle restorative work, nervous-patient care.','https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80&auto=format&fit=crop'],
+        ['Dr. Daniel Reyes','Dentist · 9 years','Root canals, crowns, emergency triage.','https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&q=80&auto=format&fit=crop'],
+        ['Sarah Lindqvist','Hygienist · 11 years','Hygiene, kids visits, gum health programs.','https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=600&q=80&auto=format&fit=crop'],
+      ].map(m => (
+        <div class="bg-white border border-line rounded-[20px] overflow-hidden">
+          <img src={m[3]} alt={m[0]} loading="lazy" decoding="async" width="600" height="600" class="aspect-square w-full object-cover" />
+          <div class="p-5"><p class="text-lg font-extrabold tracking-tight">{m[0]}</p><p class="text-xs font-bold text-aquadeep">{m[1]}</p><p class="text-sm text-ink/65 mt-1">{m[2]}</p></div>
+        </div>
+      ))}
+    </div>
+    <div class="mt-10 text-center">
+      <a href="/book" class="inline-block bg-pine text-porcelain font-bold px-8 py-3.5 rounded-full">Book with the team</a>
+    </div>
+  </section>
+</BaseLayout>

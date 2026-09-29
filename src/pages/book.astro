@@ -1,0 +1,254 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site, treatments, dentists } from '../data/site.ts';
+---
+<BaseLayout title="Book a visit" description="Request your dental appointment online. Pick a treatment, dentist and time — confirmed by email within 2 business hours.">
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 md:pt-16 grid gap-10 lg:grid-cols-[1fr_1.1fr]">
+    <div>
+      <h1 class="text-4xl sm:text-5xl lg:text-[54px] lg:leading-[1.05] font-extrabold tracking-tight">Request your visit in two minutes.</h1>
+      <p class="mt-3 text-ink/70">Pick a preferred time and we confirm by email within 2 business hours. In pain? Skip the form and call <a href={site.phoneHref} class="font-bold underline underline-offset-2">{site.phone}</a>.</p>
+      <div class="mt-6 bg-white border border-line rounded-[20px] p-6 text-sm space-y-2">
+        <p class="font-bold">{site.address}</p>
+        {site.hours.map(h => <p class="flex justify-between text-ink/70"><span>{h[0]}</span><span>{h[1]}</span></p>)}
+        <a href={site.phoneHref} class="block font-bold text-lg pt-2">{site.phone}</a>
+      </div>
+      <div class="mt-6 bg-mint/60 border border-line rounded-[20px] p-6">
+        <h2 class="font-extrabold tracking-tight">Change or cancel a request?</h2>
+        <p class="text-sm text-ink/65 mt-1">Enter your reference (LUM-XXXX) and booking email. We email the clinic for you.</p>
+        <form id="manageForm" class="mt-4 grid gap-3" novalidate>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="mRef" class="text-sm font-bold">Reference</label>
+              <input id="mRef" placeholder="LUM-XXXX" class="mt-1 w-full border border-pine/20 rounded-xl px-3 py-2.5 min-h-[48px] uppercase focus:outline-none text-sm" />
+            </div>
+            <div>
+              <label for="mEmail" class="text-sm font-bold">Booking email</label>
+              <input id="mEmail" type="email" placeholder="you@email.com" class="mt-1 w-full border border-pine/20 rounded-xl px-3 py-2.5 min-h-[48px] focus:outline-none text-sm" />
+            </div>
+          </div>
+          <div>
+            <label for="mMsg" class="text-sm font-bold">What do you need?</label>
+            <input id="mMsg" placeholder="Move to Thursday afternoon, or cancel" class="mt-1 w-full border border-pine/20 rounded-xl px-3 py-2.5 min-h-[48px] focus:outline-none text-sm" />
+          </div>
+          <input type="text" id="mWebsite" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <p id="manageMsg" class="hidden text-sm font-bold rounded-xl px-4 py-3"></p>
+          <div class="flex gap-2">
+            <button type="submit" data-action="reschedule" class="flex-1 border border-pine/25 font-bold py-3 rounded-full text-sm min-h-[48px]">Request change</button>
+            <button type="submit" data-action="cancel" class="flex-1 border border-red-300 text-red-800 font-bold py-3 rounded-full text-sm min-h-[48px]">Request cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="bg-white border border-line rounded-[22px] p-6 sm:p-8 h-fit" style="box-shadow: 0 10px 30px -12px rgba(12,59,60,.18)">
+      <ol class="flex gap-2 text-[12px] font-extrabold" aria-label="Booking progress">
+        <li data-step-label="1" class="flex-1 text-center border-b-2 border-pine pb-2">Treatment</li>
+        <li data-step-label="2" class="flex-1 text-center border-b-2 border-line text-ink/40 pb-2">Time</li>
+        <li data-step-label="3" class="flex-1 text-center border-b-2 border-line text-ink/40 pb-2">Details</li>
+      </ol>
+
+      <!-- STEP 1 -->
+      <div data-step="1" class="mt-6 grid gap-3">
+        <label for="fTreatment" class="text-sm font-bold">What do you need?</label>
+        <select id="fTreatment" class="w-full border border-pine/20 rounded-xl px-4 py-3 min-h-[52px] bg-white font-semibold">
+          {treatments.map(t => <option value={t.slug}>{t.title} — from ${t.priceFrom}</option>)}
+        </select>
+        <label for="fDentist" class="text-sm font-bold mt-2">Who with?</label>
+        <select id="fDentist" class="w-full border border-pine/20 rounded-xl px-4 py-3 min-h-[52px] bg-white font-semibold">
+          {dentists.map(d => <option value={d.id}>{d.name} — {d.role}</option>)}
+        </select>
+        <button id="toStep2" class="mt-3 bg-pine text-porcelain font-bold py-4 rounded-full min-h-[52px]">Choose a time</button>
+      </div>
+
+      <!-- STEP 2 -->
+      <div data-step="2" class="mt-6 hidden">
+        <p class="text-sm font-bold">Pick a preferred time <span class="font-normal text-ink/55">(request-based, confirmed by email)</span></p>
+        <div id="dayGrid" class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-1"></div>
+        <div id="slotGrid" class="mt-3 flex flex-wrap gap-2"></div>
+        <p id="slotHint" class="text-xs text-ink/55 mt-2">Choose a day first.</p>
+        <div class="mt-4 flex gap-2">
+          <button id="backTo1" class="flex-1 border border-pine/20 font-bold py-3.5 rounded-full text-sm min-h-[48px]">Back</button>
+          <button id="toStep3" disabled class="flex-1 bg-pine text-porcelain font-bold py-3.5 rounded-full text-sm min-h-[48px] disabled:opacity-40">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div data-step="3" class="mt-6 hidden">
+        <p id="reviewLine" class="text-sm bg-mist rounded-xl px-4 py-3 font-semibold"></p>
+        <form id="bookForm" class="mt-4 grid gap-4" novalidate>
+          <div>
+            <label for="fName" class="text-sm font-bold">Full name</label>
+            <input id="fName" class="mt-1.5 w-full border border-pine/20 rounded-xl px-4 py-3 min-h-[48px] focus:outline-none" placeholder="Jane Doe" />
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="fPhone" class="text-sm font-bold">Phone</label>
+              <input id="fPhone" type="tel" class="mt-1.5 w-full border border-pine/20 rounded-xl px-4 py-3 min-h-[48px] focus:outline-none" placeholder="(303) 555-0000" />
+            </div>
+            <div>
+              <label for="fEmail" class="text-sm font-bold">Email <span class="font-normal text-ink/55">(for confirmation)</span></label>
+              <input id="fEmail" type="email" class="mt-1.5 w-full border border-pine/20 rounded-xl px-4 py-3 min-h-[48px] focus:outline-none" placeholder="jane@email.com" />
+            </div>
+          </div>
+          <div>
+            <label for="fNotes" class="text-sm font-bold">Anything we should know? <span class="font-normal text-ink/55">(optional)</span></label>
+            <textarea id="fNotes" rows="2" class="mt-1.5 w-full border border-pine/20 rounded-xl px-4 py-3 focus:outline-none" placeholder="Nervous patient, sore upper left molar…"></textarea>
+          </div>
+          <label class="flex items-start gap-3 text-sm cursor-pointer">
+            <input id="fAnxious" type="checkbox" class="mt-1 w-5 h-5 accent-[#0C3B3C]" />
+            <span><strong>I am a nervous patient.</strong> <span class="text-ink/60">We slow down and explain each step. A third of patients tick this.</span></span>
+          </label>
+          <input type="text" id="fWebsite" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <p id="formError" class="hidden text-sm font-bold text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3"></p>
+          <button type="submit" id="submitBtn" class="bg-pine text-porcelain font-bold py-4 rounded-full min-h-[52px]">Send booking request</button>
+        </form>
+        <button id="backTo2" class="mt-3 w-full text-sm font-bold underline underline-offset-4">Back to times</button>
+      </div>
+
+      <!-- SUCCESS -->
+      <div data-step="done" class="mt-6 hidden text-center py-8">
+        <p class="font-extrabold text-lg">Request received.</p>
+        <p class="mt-2 font-mono text-3xl font-extrabold tracking-widest text-aquadeep" id="refCode"></p>
+        <p class="text-sm text-ink/65 mt-3 max-w-[38ch] mx-auto" id="doneLine"></p>
+        <p class="text-xs text-ink/50 mt-2">Quote your reference if you call us.</p>
+      </div>
+    </div>
+  </section>
+
+<script>
+  const state = { treatment: 'checkup-exam', dentist: 'any', date: '', time: '', days: [] };
+  const $ = (id) => document.getElementById(id);
+  const steps = document.querySelectorAll('[data-step]');
+  const labels = document.querySelectorAll('[data-step-label]');
+
+  function show(n) {
+    steps.forEach(s => s.classList.toggle('hidden', s.dataset.step !== String(n)));
+    labels.forEach(l => {
+      const active = parseInt(l.dataset.stepLabel) <= (n === 'done' ? 3 : n);
+      l.className = 'flex-1 text-center border-b-2 pb-2 ' + (active ? 'border-pine' : 'border-line text-ink/40');
+    });
+  }
+
+  $('toStep2').addEventListener('click', async () => {
+    state.treatment = $('fTreatment').value;
+    state.dentist = $('fDentist').value;
+    show(2);
+    const grid = $('dayGrid');
+    grid.innerHTML = '<p class="text-sm text-ink/55 col-span-full">Loading open days…</p>';
+    try {
+      const res = await fetch('/api/availability?treatment=' + state.treatment + '&days=14');
+      const data = await res.json();
+      state.days = data.days || [];
+      grid.innerHTML = '';
+      state.days.forEach(d => {
+        const b = document.createElement('button');
+        const has = d.slots.length > 0;
+        b.className = 'border rounded-xl px-2 py-2.5 text-left min-h-[56px] transition ' +
+          (has ? 'border-pine/20 hover:bg-mist' : 'border-line text-ink/35');
+        b.disabled = !has;
+        const dt = new Date(d.date + 'T12:00:00');
+        b.innerHTML = '<span class="block text-xs font-bold">' + dt.toLocaleDateString('en-US', { weekday: 'short' }) + '</span>' +
+          '<span class="block text-sm font-extrabold">' + dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + '</span>' +
+          '<span class="block text-[11px]">' + (has ? d.slots.length + ' times' : 'Closed') + '</span>';
+        b.addEventListener('click', () => selectDay(d.date));
+        b.dataset.date = d.date;
+        grid.appendChild(b);
+      });
+    } catch {
+      grid.innerHTML = '<p class="text-sm font-bold text-red-800 col-span-full">Could not load times. Please call (303) 555-0182.</p>';
+    }
+  });
+
+  function selectDay(date) {
+    state.date = date; state.time = '';
+    document.querySelectorAll('#dayGrid button').forEach(b => {
+      const on = b.dataset.date === date;
+      b.classList.toggle('bg-pine', on); b.classList.toggle('text-porcelain', on);
+    });
+    const day = state.days.find(d => d.date === date);
+    const sg = $('slotGrid'); sg.innerHTML = '';
+    day.slots.forEach(s => {
+      const b = document.createElement('button');
+      b.textContent = s;
+      b.className = 'border border-pine/20 rounded-full px-4 py-2 text-sm font-bold min-h-[44px] hover:bg-mist transition tabular-nums';
+      b.addEventListener('click', () => {
+        state.time = s;
+        sg.querySelectorAll('button').forEach(x => x.classList.remove('bg-pine', 'text-porcelain', 'border-pine'));
+        b.classList.add('bg-pine', 'text-porcelain', 'border-pine');
+        $('toStep3').disabled = false;
+        $('slotHint').textContent = day.weekday + ' ' + date + ' at ' + s + ' — preferred time, confirmed by email.';
+      });
+      sg.appendChild(b);
+    });
+    $('toStep3').disabled = true;
+    $('slotHint').textContent = 'Now pick a time.';
+  }
+
+  $('backTo1').addEventListener('click', () => show(1));
+  $('backTo2').addEventListener('click', () => show(2));
+  $('toStep3').addEventListener('click', () => {
+    const t = $('fTreatment').selectedOptions[0].textContent.split(' — ')[0];
+    const day = state.days.find(d => d.date === state.date);
+    $('reviewLine').textContent = t + ' · ' + day.weekday + ' ' + state.date + ' at ' + state.time;
+    show(3);
+  });
+
+  $('bookForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('formError');
+    const btn = $('submitBtn');
+    const email = $('fEmail').value.trim();
+    const phone = $('fPhone').value.trim();
+    const name = $('fName').value.trim();
+    if (name.length < 2) { err.textContent = 'Please add your full name.'; err.classList.remove('hidden'); return; }
+    if (phone.length < 7 && !/.+@.+\..+/.test(email)) { err.textContent = 'Please add a valid phone number or email.'; err.classList.remove('hidden'); return; }
+    err.classList.add('hidden');
+    btn.textContent = 'Sending…'; btn.disabled = true;
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          treatment: state.treatment, dentist: state.dentist, date: state.date, time: state.time,
+          name, phone, email, notes: $('fNotes').value, anxious: $('fAnxious').checked,
+          website: $('fWebsite').value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed.');
+      $('refCode').textContent = data.reference;
+      $('doneLine').textContent = 'We will confirm your preferred time by email within 2 business hours.';
+      show('done');
+    } catch (ex) {
+      err.textContent = ex.message;
+      err.classList.remove('hidden');
+      btn.textContent = 'Send booking request'; btn.disabled = false;
+    }
+  });
+
+  $('manageForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const action = e.submitter?.dataset.action === 'cancel' ? 'cancel' : 'reschedule';
+    const msg = $('manageMsg');
+    try {
+      const res = await fetch('/api/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          reference: $('mRef').value, email: $('mEmail').value, message: $('mMsg').value,
+          website: $('mWebsite').value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      msg.textContent = 'Request sent. The clinic will confirm by email.';
+      msg.className = 'text-sm font-bold rounded-xl px-4 py-3 bg-mint border border-line';
+    } catch (ex) {
+      msg.textContent = ex.message;
+      msg.className = 'text-sm font-bold rounded-xl px-4 py-3 bg-red-50 border border-red-200 text-red-800';
+    }
+    msg.classList.remove('hidden');
+  });
+</script>
+</BaseLayout>

@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { treatments } from '../../data/site.ts';
+export function getStaticPaths() {
+  return treatments.map(t => ({ params: { slug: t.slug } }));
+}
+const { slug } = Astro.params;
+const t = treatments.find(x => x.slug === slug) ?? treatments[0];
+const related = treatments.filter(x => x.slug !== t.slug && x.category === t.category).slice(0,3);
+---
+<BaseLayout title={t.title} description={`${t.title}: from $${t.priceFrom}, ${t.duration}. ${t.excerpt}`}>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 md:pt-16 grid gap-8 lg:grid-cols-2 items-start">
+    <div class="rounded-[22px] overflow-hidden aspect-[4/3] bg-mist">
+      <img src={t.image} alt={t.title} width="1000" height="750" decoding="async" class="w-full h-full object-cover" />
+    </div>
+    <div>
+      <a href="/treatments" class="text-sm font-bold underline underline-offset-4">All treatments</a>
+      <p class="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-ink/55">{t.category} · {t.duration} · {t.visits}</p>
+      <h1 class="text-4xl sm:text-5xl mt-2 font-extrabold tracking-tight">{t.title}</h1>
+      <p class="mt-3 text-ink/70">{t.excerpt}</p>
+      <p class="mt-4 text-4xl font-extrabold tabular-nums tracking-tight">From ${t.priceFrom}</p>
+      <ul class="mt-6 space-y-2.5">
+        {t.benefits.map(b => <li class="flex gap-3 text-[15px]"><span class="w-6 h-6 shrink-0 grid place-items-center rounded-full bg-mint text-aquadeep"><Icon name="check" size={13} /></span>{b}</li>)}
+      </ul>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="/book" class="bg-pine text-porcelain font-bold px-7 py-3.5 rounded-full">Book this treatment</a>
+        <a href="/pricing" class="border border-pine/20 font-bold px-7 py-3.5 rounded-full">See plan prices</a>
+      </div>
+      <p class="mt-4 text-xs text-ink/55">Exact quote confirmed after examination. Nothing starts without your approval.</p>
+    </div>
+  </section>
+  {related.length > 0 && (
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+      <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Often booked together</h2>
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-5">
+        {related.map(r => <a href={`/treatments/${r.slug}`} class="bg-white border border-line rounded-[20px] overflow-hidden block"><img src={r.image} alt={r.title} loading="lazy" decoding="async" width="600" height="375" class="aspect-[16/10] w-full object-cover" /><div class="p-5"><p class="text-lg font-extrabold tracking-tight">{r.title}</p><p class="text-sm text-ink/60 tabular-nums">From ${r.priceFrom} · {r.duration}</p></div></a>)}
+      </div>
+    </section>
+  )}
+</BaseLayout>

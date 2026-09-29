@@ -1,0 +1,19 @@
+---
+import type { Treatment } from '../data/site.ts';
+interface Props { t: Treatment; }
+const { t } = Astro.props;
+---
+<a href={`/treatments/${t.slug}`} class="treatment-card group bg-white rounded-[20px] overflow-hidden border border-line block">
+  <div class="aspect-[4/3] overflow-hidden bg-mist">
+    <img src={t.image} alt={t.title} loading="lazy" decoding="async" width="800" height="600" class="w-full h-full object-cover" />
+  </div>
+  <div class="p-5">
+    <div class="flex items-center justify-between gap-2 text-[12px] font-bold">
+      <span class="border border-pine/15 text-pine/70 px-2.5 py-1 rounded-full">{t.category}</span>
+      <span class="tabular-nums">From ${t.priceFrom} · {t.duration}</span>
+    </div>
+    <h3 class="text-[21px] font-extrabold leading-snug mt-3 tracking-tight">{t.title}</h3>
+    <p class="text-sm text-ink/70 mt-1 leading-relaxed">{t.excerpt}</p>
+    <p class="text-[12px] mt-3 text-ink/55 font-bold">{t.visits}</p>
+  </div>
+</a>

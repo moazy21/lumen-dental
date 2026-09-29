@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Page not found" description="The page you requested does not exist.">
+  <section class="max-w-2xl mx-auto px-4 py-24 text-center">
+    <p class="text-7xl font-extrabold text-aquadeep tabular-nums">404</p>
+    <h1 class="text-3xl mt-4 font-extrabold tracking-tight">That page did not floss. It is gone.</h1>
+    <p class="text-ink/65 mt-2">Try treatments, pricing, or booking a visit instead.</p>
+    <div class="mt-6 flex justify-center gap-3 flex-wrap">
+      <a href="/" class="bg-pine text-porcelain font-bold px-7 py-3 rounded-full">Home</a>
+      <a href="/book" class="border border-pine/20 font-bold px-7 py-3 rounded-full">Book a visit</a>
+    </div>
+  </section>
+</BaseLayout>

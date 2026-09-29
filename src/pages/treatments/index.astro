@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TreatmentCard from '../../components/TreatmentCard.astro';
+import { treatments } from '../../data/site.ts';
+---
+<BaseLayout title="Treatments" description="Checkups, hygiene, whitening, fillings, crowns, root canals, kids dentistry and emergency care with transparent pricing.">
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 md:pt-16">
+    <h1 class="text-4xl sm:text-5xl lg:text-[58px] lg:leading-[1.05] font-extrabold tracking-tight max-w-[18ch]">Everyday dentistry, done properly.</h1>
+    <p class="mt-3 text-ink/70 max-w-[55ch]">Every plan starts with an exam. Sample from-pricing below, exact quote confirmed before treatment.</p>
+    <div class="mt-6 flex flex-wrap gap-2" id="filters" role="group" aria-label="Filter treatments by category">
+      {['All','Preventive','Restorative','Cosmetic','Family'].map((c,i) => (
+        <button data-filter={c} aria-pressed={i===0 ? 'true' : 'false'} class={`filter-btn px-5 py-2.5 rounded-full text-sm font-bold border transition min-h-[44px] ${i===0 ? 'bg-pine text-porcelain border-pine' : 'border-pine/20'}`}>{c}</button>
+      ))}
+    </div>
+    <div id="grid" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pb-4">
+      {treatments.map(t => <div data-category={t.category}><TreatmentCard t={t} /></div>)}
+    </div>
+  </section>
+<script>
+  const btns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('#grid > div');
+  btns.forEach(b => b.addEventListener('click', () => {
+    btns.forEach(x => { x.className = 'filter-btn px-5 py-2.5 rounded-full text-sm font-bold border transition min-h-[44px] border-pine/20'; x.setAttribute('aria-pressed','false'); });
+    b.className = 'filter-btn px-5 py-2.5 rounded-full text-sm font-bold border transition min-h-[44px] bg-pine text-porcelain border-pine';
+    b.setAttribute('aria-pressed','true');
+    const f = (b as HTMLElement).dataset.filter;
+    cards.forEach(c => { (c as HTMLElement).style.display = (f === 'All' || (c as HTMLElement).dataset.category === f) ? '' : 'none'; });
+  }));
+</script>
+</BaseLayout>

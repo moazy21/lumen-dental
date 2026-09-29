@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TreatmentCard from '../components/TreatmentCard.astro';
+import Icon from '../components/Icon.astro';
+import { treatments, reviews, faqs, site } from '../data/site.ts';
+---
+<BaseLayout title="Honest dentistry for the whole family" description="LUMEN Family Dental in Denver. Checkups, hygiene, fillings, crowns, kids dentistry and same-day emergency care. Book online.">
+  <!-- HERO -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 md:pt-14 pb-10 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 items-center">
+    <div>
+      <p class="text-[13px] font-bold text-pine/55">Family dental practice · Berkeley, Denver</p>
+      <h1 class="text-[42px] sm:text-6xl lg:text-[68px] leading-[1.02] font-extrabold tracking-tight mt-3 pb-2">A dentist visit you will not dread.</h1>
+      <p class="mt-4 text-[17px] text-ink/70 leading-relaxed max-w-[44ch]">Written plans, exact pricing, nervous patients welcome. First visits are conversation, not drills.</p>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a href="/book" class="btn-primary inline-flex items-center gap-2 bg-pine text-porcelain font-bold px-7 py-3.5 rounded-full hover:bg-pincedeep transition">Book a visit <Icon name="arrow" /></a>
+        <a href="/treatments" class="btn-ghost inline-flex items-center px-7 py-3.5 rounded-full border border-pine/20 font-bold hover:bg-mist transition">See treatments</a>
+      </div>
+      <p class="mt-5 text-sm flex items-center gap-2"><span class="inline-flex gap-0.5 text-aquadeep" aria-hidden="true"><Icon name="star" /><Icon name="star" /><Icon name="star" /><Icon name="star" /><Icon name="star" /></span><strong>{site.rating}</strong><span class="text-ink/60">from {site.reviewCount} patients. Emergency? Call now.</span></p>
+    </div>
+    <div class="relative">
+      <div class="rounded-[22px] overflow-hidden aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5] bg-mist" style="box-shadow: 0 20px 60px -20px rgba(12,59,60,.25)">
+        <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1000&q=80&auto=format&fit=crop" alt="Dentist talking with a patient in a bright treatment room" width="1000" height="1200" fetchpriority="high" decoding="async" class="w-full h-full object-cover" />
+      </div>
+      <div class="absolute -bottom-5 left-4 sm:left-6 bg-white rounded-2xl border border-line px-5 py-4 flex items-center gap-4" style="box-shadow: 0 14px 34px -18px rgba(12,59,60,.3)">
+        <p class="text-[26px] leading-none font-extrabold tabular-nums">60<span class="text-base">min</span></p>
+        <p class="text-xs text-ink/60 leading-snug">unhurried first visits<br />conversation before drills</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREDIBILITY ROW -->
+  <section class="border-y border-line bg-mist/60" aria-label="Good to know">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-2 lg:grid-cols-4 gap-4 text-[14px] font-bold">
+      <span>Written plan before treatment</span>
+      <span>Same-day emergency slots</span>
+      <span>Kids from age 3 welcome</span>
+      <span>Most PPO plans accepted</span>
+    </div>
+  </section>
+
+  <!-- TREATMENTS -->
+  <section id="treatments" class="max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20">
+    <div class="max-w-[62ch]">
+      <h2 class="reveal text-3xl sm:text-[44px] sm:leading-[1.08] font-extrabold tracking-tight">Start with what hurts. Or what is overdue.</h2>
+      <p class="reveal mt-3 text-ink/65" style="--d:80ms">Eight treatments, four categories. Compare price and time, then book or ask Lumen below.</p>
+    </div>
+    <div class="mt-6 flex flex-wrap gap-2" id="filters" role="group" aria-label="Filter treatments by category">
+      {['All','Preventive','Restorative','Cosmetic','Family'].map((c,i) => (
+        <button data-filter={c} aria-pressed={i===0 ? 'true' : 'false'} class={`filter-btn px-5 py-2.5 rounded-full text-sm font-bold border transition min-h-[44px] ${i===0 ? 'bg-pine text-porcelain border-pine' : 'border-pine/20 hover:bg-mist'}`}>{c}</button>
+      ))}
+    </div>
+    <div id="grid" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {treatments.map((t,i) => <div class="reveal" style={`--d:${(i%4)*70}ms`} data-category={t.category}><TreatmentCard t={t} /></div>)}
+    </div>
+    <p class="mt-4 text-xs text-ink/50">Sample pricing shown for layout. Exact quote confirmed after examination.</p>
+  </section>
+
+  <!-- WHY US -->
+  <section class="bg-pine text-porcelain">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20 grid gap-10 lg:grid-cols-[0.95fr_1.05fr] items-center">
+      <div class="rounded-[22px] overflow-hidden aspect-[4/3] bg-pincedeep">
+        <img src="https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1000&q=80&auto=format&fit=crop" alt="Bright modern dental treatment room" loading="lazy" decoding="async" width="1000" height="750" class="w-full h-full object-cover" />
+      </div>
+      <div class="reveal">
+        <h2 class="text-3xl sm:text-[44px] sm:leading-[1.08] font-extrabold tracking-tight">Calm room, clear plan, no surprises.</h2>
+        <div class="mt-8 border-t border-porcelain/15">
+          <div class="py-5 border-b border-porcelain/15"><p class="font-bold">Nothing starts without your signature</p><p class="text-sm text-porcelain/70 mt-1">Every plan lists each item and cost. You approve it first, always.</p></div>
+          <div class="py-5 border-b border-porcelain/15"><p class="font-bold">Nervous patients are our specialty</p><p class="text-sm text-porcelain/70 mt-1">Stop signal you control, explanations before actions, no rushing.</p></div>
+          <div class="py-5 border-b border-porcelain/15"><p class="font-bold">Emergencies jump the queue</p><p class="text-sm text-porcelain/70 mt-1">Same-day slots every weekday morning. Pain does not wait, neither do we.</p></div>
+        </div>
+        <a href="/about" class="mt-6 inline-flex items-center gap-2 bg-porcelain text-pine font-bold px-6 py-3 rounded-full text-sm">Meet the practice <Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY TEASER -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="max-w-[58ch]">
+        <h2 class="reveal text-3xl sm:text-[44px] font-extrabold tracking-tight">Healthy smiles, honest timelines.</h2>
+        <p class="reveal mt-2 text-ink/65 text-[15px]" style="--d:80ms">Sample photography for layout. Your plan sets realistic expectations at the exam.</p>
+      </div>
+      <a href="/gallery" class="text-sm font-bold underline underline-offset-4">See the gallery</a>
+    </div>
+    <ul class="reveal mt-8 grid grid-cols-2 lg:grid-cols-4 gap-5">
+      {[['Whitening','5 shades, one visit','https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80&auto=format&fit=crop'],['Kids dentistry','First visit, no tears','https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=600&q=80&auto=format&fit=crop'],['Checkup','60 minutes, unhurried','https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80&auto=format&fit=crop'],['Happy patients','900+ reviews','https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80&auto=format&fit=crop']].map(r => (
+        <li class="bg-white border border-line rounded-[20px] overflow-hidden">
+          <img src={r[2]} alt={r[0]} loading="lazy" decoding="async" width="600" height="600" class="aspect-square w-full object-cover" />
+          <div class="p-4"><p class="font-bold text-[15px]">{r[0]}</p><p class="text-xs text-ink/60">{r[1]}</p></div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- NUMBERS -->
+  <section class="bg-mist/70 border-y border-line">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {[['15','','years in Berkeley',0],['900','+','patient reviews',0],['4.9','','average rating',1],['6','','months recall rhythm',0]].map(s => (
+        <div><p class="text-4xl md:text-[44px] font-extrabold tabular-nums tracking-tight"><span data-count={s[0]} data-suffix={s[1]} data-decimals={s[3]}>0</span></p><p class="text-sm text-ink/60 mt-1">{s[2]}</p></div>
+      ))}
+    </div>
+  </section>
+
+  <!-- STEPS + PLAN -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20 grid gap-10 lg:grid-cols-2">
+    <div class="reveal">
+      <h2 class="text-3xl sm:text-[38px] font-extrabold tracking-tight">First visit in three steps.</h2>
+      <ol class="mt-6 border-t border-line">
+        {[['1','Book','Online in two minutes, or call. Mention nerves, kids, or pain.'],['2','Talk','60-minute exam, X-rays, and a written plan with exact pricing.'],['3','Decide','Treatment only when you approve it. No pressure, ever.']].map(s => (
+          <li class="flex gap-5 py-5 border-b border-line"><span class="w-10 h-10 shrink-0 grid place-items-center rounded-full bg-pine text-porcelain font-bold tabular-nums" aria-hidden="true">{s[0]}</span><div><p class="font-bold">{s[1]}</p><p class="text-sm text-ink/70">{s[2]}</p></div></li>
+        ))}
+      </ol>
+    </div>
+    <div class="reveal bg-mint rounded-[22px] p-8 sm:p-10 border border-line" style="--d:120ms">
+      <h3 class="text-3xl font-extrabold tracking-tight">No insurance? LUMEN Plans.</h3>
+      <p class="mt-2 text-ink/70 text-[15px]">Exams, cleans, and X-rays covered, member pricing on treatments. No maximums, no waiting periods.</p>
+      <p class="mt-6 text-5xl font-extrabold tabular-nums tracking-tight">$29<span class="text-lg font-sans font-bold">/mo</span></p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="/pricing" class="bg-pine text-porcelain font-bold px-6 py-3 rounded-full text-sm">Compare plans</a>
+        <a href="/book" class="border border-pine/25 px-6 py-3 rounded-full text-sm font-bold">Book a visit</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="marquee overflow-hidden py-8 border-y border-line bg-white" aria-label="Patient reviews">
+    <h2 class="text-center text-2xl sm:text-[30px] font-extrabold tracking-tight">Patients, unfiltered</h2>
+    <p class="text-center text-sm text-ink/55 mt-1 mb-6">Sample reviews for layout</p>
+    <div class="flex overflow-hidden">
+      <div class="marquee-track flex gap-4 pr-4 shrink-0">
+        {[...reviews, ...reviews].map(r => (
+          <figure class="w-[300px] shrink-0 bg-porcelain border border-line rounded-2xl p-5">
+            <div class="inline-flex gap-0.5 text-aquadeep" aria-label="5 out of 5 stars"><Icon name="star" /><Icon name="star" /><Icon name="star" /><Icon name="star" /><Icon name="star" /></div>
+            <blockquote class="mt-2 text-sm leading-relaxed">&ldquo;{r.text}&rdquo;</blockquote>
+            <figcaption class="mt-3 text-xs font-bold">{r.name} <span class="font-normal text-ink/55">· {r.context}</span></figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 py-14 md:py-20">
+    <h2 class="reveal text-3xl sm:text-[38px] text-center font-extrabold tracking-tight">Asked at the front desk daily</h2>
+    <div class="mt-8 border-t border-line">
+      {faqs.map(f => (
+        <details class="group py-5 border-b border-line">
+          <summary class="flex justify-between items-center gap-4 cursor-pointer font-bold list-none min-h-[44px]">{f.q}<span class="ml-4 w-8 h-8 shrink-0 grid place-items-center rounded-full border border-pine/20 group-open:rotate-45 transition text-xl leading-none" aria-hidden="true">+</span></summary>
+          <p class="mt-2 text-[15px] text-ink/70 leading-relaxed pr-10">{f.a}</p>
+        </details>
+      ))}
+    </div>
+    <div class="mt-10 text-center bg-pine text-porcelain rounded-[22px] p-8 sm:p-10">
+      <h3 class="text-2xl font-extrabold tracking-tight">Still unsure? Ask Lumen.</h3>
+      <p class="text-[15px] text-porcelain/70 mt-1">The chat assistant answers from our clinic notes, or call {site.phone}.</p>
+      <a href="/book" class="mt-5 inline-block bg-porcelain text-pine font-bold px-8 py-3.5 rounded-full">Book your visit</a>
+    </div>
+  </section>
+
+<script>
+  const btns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('#grid > div');
+  btns.forEach(b => b.addEventListener('click', () => {
+    btns.forEach(x => { x.className = 'filter-btn px-5 py-2.5 rounded-full text-sm font-bold border transition min-h-[44px] border-pine/20 hover:bg-mist'; x.setAttribute('aria-pressed','false'); });
+    b.className = 'filter-btn px-5 py-2.5 rounded-full text-sm font-bold border transition min-h-[44px] bg-pine text-porcelain border-pine';
+    b.setAttribute('aria-pressed','true');
+    const f = (b as HTMLElement).dataset.filter;
+    cards.forEach(c => {
+      const show = f === 'All' || (c as HTMLElement).dataset.category === f;
+      (c as HTMLElement).style.display = show ? '' : 'none';
+    });
+  }));
+</script>
+</BaseLayout>

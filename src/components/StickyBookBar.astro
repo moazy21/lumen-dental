@@ -1,0 +1,20 @@
+---
+---
+<div class="fixed bottom-0 inset-x-0 z-40 md:hidden" id="sticky-book">
+  <div class="m-3 rounded-2xl bg-pine text-porcelain flex items-center justify-between pl-5 pr-2 py-2" style="box-shadow: 0 14px 34px -12px rgba(12,59,60,.5)">
+    <div class="text-sm leading-tight">
+      <p class="font-bold">Checkup from $89</p>
+      <p class="text-porcelain/70 text-xs">Same-day emergency slots</p>
+    </div>
+    <a href="/book" class="bg-porcelain text-pine font-bold text-sm px-5 py-3 rounded-xl">Book</a>
+  </div>
+</div>
+<script>
+  // Hide the sticky bar while the chat panel is open on mobile (they overlap).
+  const bar = document.getElementById('sticky-book');
+  const obs = new MutationObserver(() => {
+    const open = !document.getElementById('chat-panel')?.classList.contains('chat-hidden');
+    if (bar) bar.style.display = open && window.innerWidth < 768 ? 'none' : '';
+  });
+  obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+</script>

@@ -1,0 +1,138 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site.ts';
+
+const suggestions = [
+  'Do you see kids?',
+  'How much is whitening?',
+  'I have tooth pain, what do I do?',
+  'Do you take insurance?',
+];
+---
+<div class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end gap-3">
+  <div
+    id="chat-panel"
+    role="dialog"
+    aria-label="Chat with the LUMEN assistant"
+    class="chat-hidden w-[calc(100vw-2rem)] sm:w-[380px] bg-white border border-line rounded-[20px] flex flex-col overflow-hidden"
+    style="box-shadow: 0 24px 70px -24px rgba(12,59,60,.4); max-height: min(560px, 78dvh);"
+  >
+    <div class="bg-pine text-porcelain px-5 py-4">
+      <p class="font-extrabold">Ask Lumen</p>
+      <p class="text-xs text-porcelain/70">Answers from our clinic notes. General info, not medical advice.</p>
+    </div>
+    <div id="chat-log" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 min-h-[220px]" aria-live="polite">
+      <div class="bg-mist rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed max-w-[85%]">
+        Hi, I answer from our clinic notes: treatments, prices, kids, insurance, aftercare. What do you need?
+      </div>
+      <div class="flex flex-wrap gap-2" id="chat-suggestions">
+        {suggestions.map(s => (
+          <button data-suggest={s} class="text-[13px] font-bold border border-pine/20 rounded-full px-3.5 py-2 min-h-[40px] hover:bg-mist transition text-left">{s}</button>
+        ))}
+      </div>
+    </div>
+    <form id="chat-form" class="border-t border-line p-3 flex gap-2">
+      <label for="chat-input" class="sr-only">Type your question</label>
+      <input
+        id="chat-input"
+        autocomplete="off"
+        maxlength="500"
+        placeholder="Ask about treatments, prices…"
+        class="flex-1 border border-pine/20 rounded-xl px-4 py-2.5 text-sm min-h-[44px] focus:outline-none placeholder:text-ink/40"
+      />
+      <button type="submit" aria-label="Send message" class="w-11 h-11 shrink-0 grid place-items-center rounded-xl bg-pine text-porcelain hover:bg-pincedeep transition">
+        <Icon name="send" size={17} />
+      </button>
+    </form>
+  </div>
+  <button
+    id="chat-toggle"
+    aria-expanded="false"
+    aria-controls="chat-panel"
+    aria-label="Open chat with LUMEN assistant"
+    class="w-14 h-14 grid place-items-center rounded-full bg-pine text-porcelain hover:bg-pincedeep transition"
+    style="box-shadow: 0 14px 34px -12px rgba(12,59,60,.55)"
+  >
+    <span id="chat-icon-open"><Icon name="chat" size={22} /></span>
+    <span id="chat-icon-close" class="hidden"><Icon name="close" size={20} /></span>
+  </button>
+</div>
+
+<script define:vars={{ phone: site.phone, phoneHref: site.phoneHref }}>
+  const panel = document.getElementById('chat-panel');
+  const toggle = document.getElementById('chat-toggle');
+  const iconOpen = document.getElementById('chat-icon-open');
+  const iconClose = document.getElementById('chat-icon-close');
+  const log = document.getElementById('chat-log');
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('chat-input');
+  const history = [];
+
+  function setOpen(open) {
+    panel.classList.toggle('chat-hidden', !open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close chat' : 'Open chat with LUMEN assistant');
+    iconOpen.classList.toggle('hidden', open);
+    iconClose.classList.toggle('hidden', !open);
+    if (open) input.focus();
+  }
+  toggle.addEventListener('click', () => setOpen(panel.classList.contains('chat-hidden')));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !panel.classList.contains('chat-hidden')) setOpen(false);
+  });
+
+  function bubble(html, mine) {
+    const div = document.createElement('div');
+    div.className = mine
+      ? 'ml-auto bg-pine text-porcelain rounded-2xl rounded-tr-md px-4 py-3 text-sm leading-relaxed max-w-[85%]'
+      : 'bg-mist rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed max-w-[85%]';
+    div.innerHTML = html;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  async function send(text) {
+    const clean = text.trim().slice(0, 500);
+    if (clean.length < 2) return;
+    document.getElementById('chat-suggestions')?.remove();
+    bubble(escapeHtml(clean), true);
+    const typing = bubble('<span class="chat-typing" aria-label="Assistant is typing"><span></span><span></span><span></span></span>', false);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: clean, history: history.slice(-6) }),
+      });
+      const data = await res.json();
+      typing.remove();
+      if (!res.ok || data.error) {
+        bubble(escapeHtml(data.error || 'Something went wrong. Please call ' + phone + '.'), false);
+        return;
+      }
+      let html = escapeHtml(data.reply).replace(/\n/g, '<br>');
+      if (data.sources && data.sources.length > 0) {
+        html += '<p class="mt-2 text-xs opacity-60">Sources: ' + data.sources.map(escapeHtml).join(' · ') + '</p>';
+      }
+      html += '<p class="mt-3 flex flex-wrap gap-2"><a href="/book" class="font-bold underline underline-offset-2">Book a visit</a><a href="' + phoneHref + '" class="font-bold underline underline-offset-2">Call ' + phone + '</a></p>';
+      bubble(html, false);
+      history.push({ role: 'user', content: clean }, { role: 'assistant', content: data.reply });
+    } catch {
+      typing.remove();
+      bubble('Connection failed. Please call ' + phone + ' or try again.', false);
+    }
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    send(input.value);
+    input.value = '';
+  });
+  log.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-suggest]');
+    if (btn) send(btn.dataset.suggest);
+  });
+</script>

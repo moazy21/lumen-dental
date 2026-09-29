@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { treatments, dentists } from '../../data/site.ts';
 import { durationForTreatment, isValidSlot, makeReference, daySlots } from '../../lib/slots.ts';
+import { claimSlot, isTaken, saveBooking, storeConfigured } from '../../lib/store.ts';
 
 export const prerender = false;
 
@@ -93,13 +94,57 @@ export const POST: APIRoute = async ({ request }) => {
 
   const reference = makeReference();
   const day = daySlots(date, durationMin);
+
+  // Resolve "first available" to a real dentist with that time free, then
+  // claim it so the slot disappears for everyone else. Unconfigured store =
+  // old email-only behavior (nothing is blocked).
+  const LANES = ['osei', 'reyes', 'lindqvist'];
+  let dentistId = dentist.id;
+  if (storeConfigured()) {
+    if (dentistId === 'any') {
+      dentistId = '';
+      for (const lane of LANES) {
+        if (!(await isTaken(lane, date, time, durationMin))) {
+          dentistId = lane;
+          break;
+        }
+      }
+      if (!dentistId) {
+        return Response.json(
+          { error: 'That time just filled. Please pick another slot.' },
+          { status: 409 }
+        );
+      }
+    }
+    const claimed = await claimSlot(dentistId, date, time, durationMin);
+    if (!claimed) {
+      return Response.json(
+        { error: 'That time just filled. Please pick another slot.' },
+        { status: 409 }
+      );
+    }
+    await saveBooking({
+      reference,
+      treatment: treatment.slug,
+      dentist: dentistId,
+      date,
+      time,
+      durationMin,
+      name,
+      phone,
+      email,
+      createdAt: new Date().toISOString(),
+    });
+  }
+  const dentistName =
+    dentists.find((d) => d.id === dentistId)?.name ?? dentist.name;
   const subject = `Booking request ${reference} — ${treatment.title} on ${date} at ${time}`;
   const text = [
     `New booking request (website, request-based — please confirm with the patient).`,
     ``,
     `Reference: ${reference}`,
     `Treatment: ${treatment.title} (~${durationMin} min)`,
-    `Dentist: ${dentist.name}`,
+    `Dentist: ${dentistName}`,
     `Preferred time: ${day.weekday} ${date} at ${time}`,
     `Patient: ${name}`,
     `Phone: ${phone || '—'}`,
@@ -125,7 +170,7 @@ export const POST: APIRoute = async ({ request }) => {
         `Hi ${name},`,
         ``,
         `We received your booking request and will confirm within 2 business hours:`,
-        `${treatment.title} with ${dentist.name}, ${day.weekday} ${date} at ${time}.`,
+        `${treatment.title} with ${dentistName}, ${day.weekday} ${date} at ${time}.`,
         `Your reference: ${reference} (quote it if you call us).`,
         ``,
         `Need changes? Reply to this email or call (303) 555-0182.`,

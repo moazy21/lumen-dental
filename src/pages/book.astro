@@ -21,10 +21,14 @@ import { site, treatments, dentists } from '../data/site.ts';
               <label for="mRef" class="text-sm font-bold">Reference</label>
               <input id="mRef" placeholder="LUM-XXXX" class="mt-1 w-full border border-pine/20 rounded-xl px-3 py-2.5 min-h-[48px] uppercase focus:outline-none text-sm" />
             </div>
-            <div>
-              <label for="mEmail" class="text-sm font-bold">Booking email</label>
-              <input id="mEmail" type="email" placeholder="you@email.com" class="mt-1 w-full border border-pine/20 rounded-xl px-3 py-2.5 min-h-[48px] focus:outline-none text-sm" />
-            </div>
+          <div>
+            <label for="mEmail" class="text-sm font-bold">Booking email</label>
+            <input id="mEmail" type="email" placeholder="you@email.com" class="mt-1 w-full border border-pine/20 rounded-xl px-3 py-2.5 min-h-[48px] focus:outline-none text-sm" />
+          </div>
+          <div>
+            <label for="mPhone" class="text-sm font-bold">Or booking phone</label>
+            <input id="mPhone" type="tel" placeholder="(303) 555-0000" class="mt-1 w-full border border-pine/20 rounded-xl px-3 py-2.5 min-h-[48px] focus:outline-none text-sm" />
+          </div>
           </div>
           <div>
             <label for="mMsg" class="text-sm font-bold">What do you need?</label>
@@ -136,7 +140,7 @@ import { site, treatments, dentists } from '../data/site.ts';
     const grid = $('dayGrid');
     grid.innerHTML = '<p class="text-sm text-ink/55 col-span-full">Loading open days…</p>';
     try {
-      const res = await fetch('/api/availability?treatment=' + state.treatment + '&days=14');
+      const res = await fetch('/api/availability?treatment=' + state.treatment + '&dentist=' + state.dentist + '&days=14');
       const data = await res.json();
       state.days = data.days || [];
       grid.innerHTML = '';
@@ -147,9 +151,10 @@ import { site, treatments, dentists } from '../data/site.ts';
           (has ? 'border-pine/20 hover:bg-mist' : 'border-line text-ink/35');
         b.disabled = !has;
         const dt = new Date(d.date + 'T12:00:00');
+        const dayLabel = d.closed ? 'Closed' : (d.full ? 'Fully booked' : d.slots.length + ' times');
         b.innerHTML = '<span class="block text-xs font-bold">' + dt.toLocaleDateString('en-US', { weekday: 'short' }) + '</span>' +
           '<span class="block text-sm font-extrabold">' + dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + '</span>' +
-          '<span class="block text-[11px]">' + (has ? d.slots.length + ' times' : 'Closed') + '</span>';
+          '<span class="block text-[11px]">' + dayLabel + '</span>';
         b.addEventListener('click', () => selectDay(d.date));
         b.dataset.date = d.date;
         grid.appendChild(b);
@@ -236,7 +241,8 @@ import { site, treatments, dentists } from '../data/site.ts';
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action,
-          reference: $('mRef').value, email: $('mEmail').value, message: $('mMsg').value,
+          reference: $('mRef').value, email: $('mEmail').value, phone: $('mPhone').value,
+          message: $('mMsg').value,
           website: $('mWebsite').value,
         }),
       });

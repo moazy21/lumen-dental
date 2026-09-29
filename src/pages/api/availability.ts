@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { treatments } from '../../data/site.ts';
 import { durationForTreatment, nextDays, daySlots } from '../../lib/slots.ts';
 
+export const prerender = false;
+
 export const GET: APIRoute = async ({ url }) => {
   const slug = url.searchParams.get('treatment') ?? 'checkup-exam';
   const treatment = treatments.find((t) => t.slug === slug);

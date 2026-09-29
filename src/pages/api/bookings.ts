@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { treatments, dentists } from '../../data/site.ts';
 import { durationForTreatment, isValidSlot, makeReference, daySlots } from '../../lib/slots.ts';
 
+export const prerender = false;
+
 // Best-effort in-memory throttle (see chat.ts for the caveat).
 const hits = new Map<string, number[]>();
 function throttled(ip: string): boolean {

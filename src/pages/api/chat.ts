@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { retrieve, isEmergencyQuery } from '../../lib/retrieval.ts';
 
+export const prerender = false;
+
 // Best-effort in-memory throttle. Serverless instances do not share memory,
 // so this is a courtesy limit, not a security boundary. Redis-backed limiting
 // is the documented upgrade path.

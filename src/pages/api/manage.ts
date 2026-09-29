@@ -1,5 +1,7 @@
 import type { APIRoute } from 'astro';
 
+export const prerender = false;
+
 // Reschedule / cancel requests are emailed to the clinic — request-based,
 // like bookings. No slot inventory exists without a database (documented).
 
